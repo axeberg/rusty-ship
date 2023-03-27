@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package battleship;
+
+service Battleship {
+  rpc RegisterPlayer(Player) returns (PlayerInfo) {}
+  rpc RemovePlayer(Player) returns (Empty) {}
+  rpc PlaceShip(stream ShipPlacement) returns (GameState) {}
+  rpc MakeGuess(Guess) returns (GuessResult) {}
+  rpc GetGameState(Player) returns (GameState) {}
+}
+
+message Empty {}
+
+message Player {
+  string name = 1;
+}
+
+message PlayerInfo {
+  string id = 1;
+}
+
+message ShipPlacement {
+  string player_id = 1;
+  string ship_type = 2;
+  uint32 x = 3;
+  uint32 y = 4;
+  bool is_vertical = 5;
+}
+
+message Guess {
+  string player_id = 1;
+  uint32 x = 2;
+  uint32 y = 3;
+}
+
+message GuessResult {
+  enum Result {
+    HIT = 0;
+    MISS = 1;
+    SUNK = 2;
+  }
+  Result result = 1;
+}
+
+message CellState {
+  enum State {
+    EMPTY = 0;
+    OCCUPIED = 1;
+    HIT = 2;
+    MISS = 3;
+  }
+  State state = 1;
+}
+
+message Cell {
+  uint32 x = 1;
+  uint32 y = 2;
+  CellState.State state = 3;
+}
+
+message GameState {
+  repeated Cell board = 1;
+  map<string, uint32> ships_remaining = 2;
+  repeated string remaining_ships = 3;
+}
